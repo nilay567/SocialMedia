@@ -2,7 +2,8 @@ import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 
 dotenv.config();
-const secret = process.env.JWTKEY;
+const secret = "mySuperSecretKey12345!"
+;
 const authMiddleWare = async (req, res, next) => {
   try {
     const token = req.headers.authorization.split(" ")[1];

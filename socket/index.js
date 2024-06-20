@@ -17,7 +17,7 @@ io.on("connection", (socket) => {
     // send all active users to new user
     io.emit("get-users", activeUsers);
   });
-
+ 
   socket.on("disconnect", () => {
     // remove user from active users
     activeUsers = activeUsers.filter((user) => user.socketId !== socket.id);

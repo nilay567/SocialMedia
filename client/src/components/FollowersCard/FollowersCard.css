@@ -1,61 +1,99 @@
-
-.FollowersCard{
+/* Base styling for FollowersCard */
+.FollowersCard {
     width: 100%;
+    max-width: 400px; /* Adjust maximum width as needed */
     border-radius: 0.7rem;
-    gap: 1rem;
+    background-color: #f9f9f9; /* Light grey background */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Light shadow */
+    padding: 1rem; /* Padding inside the card */
     display: flex;
     flex-direction: column;
-    font-size: 13px;
-    max-height: 10rem;
+    font-size: 14px; /* Increased font size for better readability */
+    overflow: hidden; /* Ensure content doesn't overflow */
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
 }
-.follower{
+
+/* Styling for individual follower items */
+.follower {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    padding: 0.8rem; /* Padding around each follower item */
+    transition: background-color 0.3s ease;
 }
 
-.follower>div{
-    display: flex;
-    gap: 10px;
-}
-
-
-.followerImage{
+/* Styling for follower avatar image */
+.followerImage {
     width: 3.2rem;
     height: 3.2rem;
     border-radius: 50%;
+    object-fit: cover; /* Ensure avatars maintain aspect ratio */
 }
 
-.name{
+/* Styling for follower name and details */
+.name {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
     justify-content: center;
 }
 
-.name>span:nth-of-type(1){
+.name > span:nth-of-type(1) {
     font-weight: bold;
 }
 
-
-
-.fc-button{
+/* Styling for follow/unfollow button */
+.fc-button {
     height: 2rem;
-    padding-left: 20px;
-    padding-right: 20px;
-}
-
-.UnfollowButton{
-    color: var(--orange);
-    border: 2px solid var(--orange);
+    min-width: 6rem; /* Ensure buttons have a minimum width */
+    padding: 0.5rem 1rem; /* Adjust padding for better button size */
+    border: none;
+    border-radius: 0.5rem; /* Rounded button corners */
     cursor: pointer;
-    background: transparent;
+    transition: background-color 0.3s ease, transform 0.3s ease, color 0.3s ease;
 }
 
+.FollowButton {
+    color: #ffffff; /* White text color for contrast */
+    background-color: #1e88e5; /* Blue background color */
+    border: 2px solid #1e88e5; /* Blue border */
+}
 
-.FollowersCard>span{
+.FollowButton:hover {
+    background-color: #1565c0; /* Darker blue on hover */
+    border-color: #1565c0;
+}
+
+.UnfollowButton {
+    color: #ffffff; /* White text color for contrast */
+    background-color: #e53935; /* Red background color */
+    border: 2px solid #e53935; /* Red border */
+}
+
+.UnfollowButton:hover {
+    background-color: #c62828; /* Darker red on hover */
+    border-color: #c62828;
+}
+
+/* Styling for 'See All' link */
+.FollowersCard > span {
     font-weight: bold;
-    color: orange;
+    color: #2196f3; /* Blue color for link */
     align-self: center;
     cursor: pointer;
+    margin-top: 1rem; /* Margin above the 'See All' link */
+}
+
+/* Hover effect for individual follower items */
+.follower:hover {
+    background-color: #e0e0e0; /* Lighter grey background on hover */
+    transform: translateY(-3px); /* Lift up slightly on hover */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* Enhanced shadow on hover */
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .FollowersCard {
+        max-width: 100%; /* Full width on smaller screens */
+    }
 }

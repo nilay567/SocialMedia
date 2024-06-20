@@ -1,72 +1,69 @@
 import React from "react";
 import "./ProfileCard.css";
-import Cover from "../../img/cover.jpg";
-import Profile from "../../img/profileImg.jpg";
 import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
-const ProfileCard = ({location}) => {
+
+const ProfileCard = ({ location }) => {
   const { user } = useSelector((state) => state.authReducer.authData);
-  const posts = useSelector((state)=>state.postReducer.posts)
+  const posts = useSelector((state) => state.postReducer.posts);
   const serverPublic = process.env.REACT_APP_PUBLIC_FOLDER;
 
   return (
-    <div className="ProfileCard">
-      <div className="ProfileImages">
-        <img src={
+    <div className="new-profile-card">
+      <div className="new-profile-images">
+        <img
+          src={
             user.coverPicture
               ? serverPublic + user.coverPicture
               : serverPublic + "defaultCover.jpg"
-          } alt="CoverImage" />
+          }
+          alt="Cover"
+          className="new-cover-image"
+        />
         <img
           src={
             user.profilePicture
               ? serverPublic + user.profilePicture
               : serverPublic + "defaultProfile.png"
           }
-          alt="ProfileImage"
+          alt="Profile"
+          className="new-profile-image"
         />
       </div>
-      <div className="ProfileName">
-        <span>{user.firstname} {user.lastname}</span>
-        <span>{user.worksAt? user.worksAt : 'Write about yourself'}</span>
+      <div className="new-profile-details">
+        <h3>{user.firstname} {user.lastname}</h3>
+        <p>{user.worksAt ? user.worksAt : 'Write about yourself'}</p>
       </div>
 
-      <div className="followStatus">
-        <hr />
-        <div>
-          <div className="follow">
-            <span>{user.followers.length}</span>
+      <div className="new-follow-status">
+        <div className="new-status-details">
+          <div className="new-follow">
+            <span className="new-count">{user.followers.length}</span>
             <span>Followers</span>
           </div>
-          <div className="vl"></div>
-          <div className="follow">
-            <span>{user.following.length}</span>
+          <div className="new-vertical-line"></div>
+          <div className="new-follow">
+            <span className="new-count">{user.following.length}</span>
             <span>Following</span>
           </div>
-          {/* for profilepage */}
           {location === "profilePage" && (
             <>
-              <div className="vl"></div>
-              <div className="follow">
-                <span>{
-                posts.filter((post)=>post.userId === user._id).length
-                }</span>
+              <div className="new-vertical-line"></div>
+              <div className="new-follow">
+                <span className="new-count">
+                  {posts.filter((post) => post.userId === user._id).length}
+                </span>
                 <span>Posts</span>
-              </div>{" "}
+              </div>
             </>
           )}
         </div>
-        <hr />
       </div>
 
-      {location === "profilePage" ? (
-        ""
-      ) : (
-        <span>
-          <Link to={`/profile/${user._id}`} style={{ textDecoration: "none", color: "inherit" }}>
-            My Profile
-          </Link>
-        </span>
+      {location !== "profilePage" && (
+        <div className="new-profile-link">
+          <Link to={`/profile/${user._id}`}>My Profile</Link>
+        </div>
       )}
     </div>
   );

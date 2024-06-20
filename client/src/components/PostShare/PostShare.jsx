@@ -15,7 +15,7 @@ const PostShare = () => {
   const [image, setImage] = useState(null);
   const desc = useRef();
   const serverPublic = process.env.REACT_APP_PUBLIC_FOLDER;
-
+  console.log(serverPublic)
   // handle Image Change
   const onImageChange = (event) => {
     if (event.target.files && event.target.files[0]) {

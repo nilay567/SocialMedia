@@ -4,6 +4,7 @@ import FollowersModal from "../FollowersModal/FollowersModal";
 import { getAllUser } from "../../api/UserRequests";
 import User from "../User/User";
 import { useSelector } from "react-redux";
+
 const FollowersCard = ({ location }) => {
   const [modalOpened, setModalOpened] = useState(false);
   const [persons, setPersons] = useState([]);
@@ -11,25 +12,29 @@ const FollowersCard = ({ location }) => {
 
   useEffect(() => {
     const fetchPersons = async () => {
-      const { data } = await getAllUser();
-      setPersons(data);
+      try {
+        const { data } = await getAllUser();
+        setPersons(data);
+      } catch (error) {
+        console.error("Error fetching users:", error);
+      }
     };
     fetchPersons();
   }, []);
 
   return (
-    <div className="FollowersCard">
-      <h3>People you may know</h3>
-
-      {persons.map((person, id) => {
-        if (person._id !== user._id) return <User person={person} key={id} />;
-      })}
-      {!location ? (
-        <span onClick={() => setModalOpened(true)}>Show more</span>
-      ) : (
-        ""
+    <div className="followers-card">
+      <h3>People You May Know</h3>
+      <div className="followers-list">
+        {persons.map((person, id) => (
+          person._id !== user._id && <User person={person} key={id} />
+        ))}
+      </div>
+      {!location && (
+        <span className="show-more" onClick={() => setModalOpened(true)}>
+          Show More
+        </span>
       )}
-
       <FollowersModal
         modalOpened={modalOpened}
         setModalOpened={setModalOpened}

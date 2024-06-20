@@ -41,7 +41,8 @@ export const updateUser = async (req, res) => {
   const id = req.params.id;
   // console.log("Data Received", req.body)
   const { _id, currentUserAdmin, password } = req.body;
-  
+  const JWTKEY="mySuperSecretKey12345!"
+
   if (id === _id) {
     try {
       // if we also have to update password then password will be bcrypted again
@@ -55,7 +56,7 @@ export const updateUser = async (req, res) => {
       });
       const token = jwt.sign(
         { username: user.username, id: user._id },
-        process.env.JWTKEY,
+        JWTKEY,
         { expiresIn: "1h" }
       );
       console.log({user, token})

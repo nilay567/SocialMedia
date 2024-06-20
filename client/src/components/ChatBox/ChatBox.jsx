@@ -1,170 +1,141 @@
-import React, { useEffect, useState } from "react";
-import { useRef } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { addMessage, getMessages } from "../../api/MessageRequests";
 import { getUser } from "../../api/UserRequests";
 import "./ChatBox.css";
 import { format } from "timeago.js";
-import InputEmoji from 'react-input-emoji'
+import InputEmoji from 'react-input-emoji';
 
-const ChatBox = ({ chat, currentUser, setSendMessage,  receivedMessage }) => {
+const ChatBox = ({ chat, currentUser, setSendMessage, receivedMessage }) => {
   const [userData, setUserData] = useState(null);
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
 
-  const handleChange = (newMessage)=> {
-    setNewMessage(newMessage)
-  }
+  const handleChange = (newText) => {
+    setNewMessage(newText);
+  };
 
-  // fetching data for header
   useEffect(() => {
-    const userId = chat?.members?.find((id) => id !== currentUser);
-    const getUserData = async () => {
+    const fetchUserData = async () => {
+      const userId = chat?.members?.find((id) => id !== currentUser);
       try {
         const { data } = await getUser(userId);
         setUserData(data);
       } catch (error) {
-        console.log(error);
+        console.log("Error fetching user data:", error);
       }
     };
 
-    if (chat !== null) getUserData();
+    if (chat) {
+      fetchUserData();
+    }
   }, [chat, currentUser]);
 
-  // fetch messages
   useEffect(() => {
     const fetchMessages = async () => {
       try {
-        const { data } = await getMessages(chat._id);
+        const { data } = await getMessages(chat?._id);
         setMessages(data);
       } catch (error) {
-        console.log(error);
+        console.log("Error fetching messages:", error);
       }
     };
 
-    if (chat !== null) fetchMessages();
+    if (chat) {
+      fetchMessages();
+    }
   }, [chat]);
 
-
-  // Always scroll to last Message
-  useEffect(()=> {
+  useEffect(() => {
     scroll.current?.scrollIntoView({ behavior: "smooth" });
-  },[messages])
+  }, [messages]);
 
-
-
-  // Send Message
-  const handleSend = async(e)=> {
-    e.preventDefault()
-    const message = {
-      senderId : currentUser,
+  const handleSend = async (e) => {
+    e.preventDefault();
+    const messageData = {
+      senderId: currentUser,
       text: newMessage,
-      chatId: chat._id,
-  }
-  const receiverId = chat.members.find((id)=>id!==currentUser);
-  // send message to socket server
-  setSendMessage({...message, receiverId})
-  // send message to database
-  try {
-    const { data } = await addMessage(message);
-    setMessages([...messages, data]);
-    setNewMessage("");
-  }
-  catch
-  {
-    console.log("error")
-  }
-}
+      chatId: chat?._id,
+    };
 
-// Receive Message from parent component
-useEffect(()=> {
-  console.log("Message Arrived: ", receivedMessage)
-  if (receivedMessage !== null && receivedMessage.chatId === chat._id) {
-    setMessages([...messages, receivedMessage]);
-  }
+    const receiverId = chat.members.find((id) => id !== currentUser);
+    setSendMessage({ ...messageData, receiverId });
 
-},[receivedMessage])
+    try {
+      const { data } = await addMessage(messageData);
+      setMessages([...messages, data]);
+      setNewMessage("");
+    } catch (error) {
+      console.log("Error sending message:", error);
+    }
+  };
 
-
+  useEffect(() => {
+    if (receivedMessage && receivedMessage.chatId === chat?._id) {
+      setMessages([...messages, receivedMessage]);
+    }
+  }, [receivedMessage]);
 
   const scroll = useRef();
   const imageRef = useRef();
+
   return (
-    <>
-      <div className="ChatBox-container">
-        {chat ? (
-          <>
-            {/* chat-header */}
-            <div className="chat-header">
-              <div className="follower">
-                <div>
-                  <img
-                    src={
-                      userData?.profilePicture
-                        ? process.env.REACT_APP_PUBLIC_FOLDER +
-                          userData.profilePicture
-                        : process.env.REACT_APP_PUBLIC_FOLDER +
-                          "defaultProfile.png"
-                    }
-                    alt="Profile"
-                    className="followerImage"
-                    style={{ width: "50px", height: "50px" }}
-                  />
-                  <div className="name" style={{ fontSize: "0.9rem" }}>
-                    <span>
-                      {userData?.firstname} {userData?.lastname}
-                    </span>
-                  </div>
-                </div>
+    <div className="chatbox-container">
+      {chat ? (
+        <div className="chatbox">
+          <div className="chatbox-header">
+            <div className="user-info">
+              <img
+                src={
+                  userData?.profilePicture
+                    ? process.env.REACT_APP_PUBLIC_FOLDER + userData.profilePicture
+                    : process.env.REACT_APP_PUBLIC_FOLDER + "defaultProfile.png"
+                }
+                alt="Profile"
+                className="user-avatar"
+              />
+              <div className="user-name">
+                {userData?.firstname} {userData?.lastname}
               </div>
-              <hr
-                style={{
-                  width: "95%",
-                  border: "0.1px solid #ececec",
-                  marginTop: "20px",
-                }}
-              />
             </div>
-            {/* chat-body */}
-            <div className="chat-body" >
-              {messages.map((message) => (
-                <>
-                  <div ref={scroll}
-                    className={
-                      message.senderId === currentUser
-                        ? "message own"
-                        : "message"
-                    }
-                  >
-                    <span>{message.text}</span>{" "}
-                    <span>{format(message.createdAt)}</span>
-                  </div>
-                </>
-              ))}
+          </div>
+
+          <div className="chatbox-body">
+            {messages.map((message, index) => (
+              <div
+                key={index}
+                ref={index === messages.length - 1 ? scroll : null}
+                className={`message ${message.senderId === currentUser ? 'own' : 'other'}`}
+              >
+                <span className="message-text">{message.text}</span>
+                <span className="message-time">{format(message.createdAt)}</span>
+              </div>
+            ))}
+            <div ref={scroll}></div>
+          </div>
+
+          <div className="chatbox-footer">
+            <div className="input-area">
+              <div className="attach-icon" onClick={() => imageRef.current.click()}>
+                +
+              </div>
+              <InputEmoji value={newMessage} onChange={handleChange} />
             </div>
-            {/* chat-sender */}
-            <div className="chat-sender">
-              <div onClick={() => imageRef.current.click()}>+</div>
-              <InputEmoji
-                value={newMessage}
-                onChange={handleChange}
-              />
-              <div className="send-button button" onClick = {handleSend}>Send</div>
-              <input
-                type="file"
-                name=""
-                id=""
-                style={{ display: "none" }}
-                ref={imageRef}
-              />
-            </div>{" "}
-          </>
-        ) : (
-          <span className="chatbox-empty-message">
-            Tap on a chat to start conversation...
-          </span>
-        )}
-      </div>
-    </>
+            <div className="send-button" onClick={handleSend}>
+              Send
+            </div>
+            <input
+              type="file"
+              style={{ display: "none" }}
+              ref={imageRef}
+            />
+          </div>
+        </div>
+      ) : (
+        <div className="empty-chatbox-message">
+          Tap on a chat to start a conversation...
+        </div>
+      )}
+    </div>
   );
 };
 
