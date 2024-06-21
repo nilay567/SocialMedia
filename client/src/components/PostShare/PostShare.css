@@ -1,79 +1,115 @@
-.PostShare{
+.post-share {
     display: flex;
-    gap: 1rem;
-    background-color: var(--cardColor);
-    padding: 1rem;
-    border-radius: 1rem;
+    align-items: flex-start;
+    background: #fff;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+    margin-bottom: 25px;
+    transition: box-shadow 0.3s, transform 0.3s;
 }
 
+.post-share:hover {
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+    transform: translateY(-5px);
+}
 
-.PostShare>img{
+.profile-picture {
+    width: 60px;
+    height: 60px;
     border-radius: 50%;
-    width: 3rem;
-    height: 3rem;
-}
-.PostShare>div{
-    display: flex;
-    flex-direction: column;
-    width: 90%;
-    gap: 1rem;
+    object-fit: cover;
+    margin-right: 20px;
 }
 
-.PostShare>div>input{
-    background-color: var(--inputColor);
-    border-radius: 10px;
-    padding: 10px;
-    font-size: 17px;
+.post-content {
+    flex: 1;
+}
+
+.post-input {
+    width: 100%;
+    padding: 12px;
     border: none;
+    border-bottom: 2px solid #ddd;
+    margin-bottom: 15px;
+    font-size: 18px;
     outline: none;
+    transition: border-color 0.3s;
 }
 
+.post-input:focus {
+    border-color: #007bff;
+}
 
-
-
-
-.postOptions{
+.post-options {
     display: flex;
-    justify-content: space-around;
+    justify-content: space-between;
+    align-items: center;
 }
 
-.option{
-    padding: 5px;
-    padding-left: 10px;
-    padding-right: 10px;
-    border-radius: 10px;
+.option {
     display: flex;
     align-items: center;
-    justify-content: center;
-    font-size: 12px;
-}
-
-.option:hover{
     cursor: pointer;
-}
-.ps-button{
-    padding: 5px;
-    padding-left: 20px;
-    padding-right: 20px;
-    font-size: 12px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    transition: background 0.3s, transform 0.3s;
 }
 
+.option:hover {
+    background: #f7f7f7;
+    transform: translateY(-2px);
+}
 
-.previewImage{
+.option svg {
+    margin-right: 5px;
+}
+
+.post-button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    background: #007bff;
+    color: #fff;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.3s;
+}
+
+.post-button:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}
+
+.post-button:not(:disabled):hover {
+    background: #0056b3;
+    transform: translateY(-2px);
+}
+
+.preview-container {
     position: relative;
-    /* display: flex; */
+    margin-top: 15px;
 }
 
-.previewImage>svg{
+.close-icon {
     position: absolute;
-    right: 1rem;
-    top: 0.5rem;
+    top: 8px;
+    right: 8px;
     cursor: pointer;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 50%;
+    padding: 3px;
+    transition: background 0.3s;
 }
 
-.previewImage>img{
-    width: 100%;
-    max-height: 20rem;
-    object-fit: cover;
-    border-radius: 0.5rem;
+.close-icon:hover {
+    background: rgba(255, 255, 255, 1);
 }
+
+.preview-image {
+    width: 100%;
+    border-radius: 15px;
+    max-height: 350px;
+    object-fit: cover;
+}
+ 

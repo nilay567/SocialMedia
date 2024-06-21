@@ -4,80 +4,67 @@ import { UilPen } from "@iconscout/react-unicons";
 import ProfileModal from "../ProfileModal/ProfileModal";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
-import * as UserApi from "../../api/UserRequests.js";
+import * as UserApi from "../../api/UserRequests";
 import { logout } from "../../actions/AuthActions";
 
+const UserInfo = ({ label, value }) => (
+  <div className="info">
+    <span>
+      <b>{label}: </b>
+    </span>
+    <span>{value}</span>
+  </div>
+);
+
 const InfoCard = () => {
-  const dispatch = useDispatch()
-  const params = useParams();
-  const [modalOpened, setModalOpened] = useState(false);
-  const profileUserId = params.id;
+  const dispatch = useDispatch();
+  const { id: profileUserId } = useParams();
+  const [isModalOpen, setModalOpen] = useState(false);
   const [profileUser, setProfileUser] = useState({});
   const { user } = useSelector((state) => state.authReducer.authData);
 
-
-  const handleLogOut = ()=> {
-    dispatch(logout())
-  }
-
+  const handleLogOut = () => {
+    dispatch(logout());
+  };
 
   useEffect(() => {
     const fetchProfileUser = async () => {
       if (profileUserId === user._id) {
         setProfileUser(user);
       } else {
-        console.log("fetching")
-        const profileUser = await UserApi.getUser(profileUserId);
-        setProfileUser(profileUser);
-        console.log(profileUser)
+        try {
+          const fetchedUser = await UserApi.getUser(profileUserId);
+          setProfileUser(fetchedUser);
+        } catch (error) {
+          console.error("Error fetching profile user:", error);
+        }
       }
     };
+
     fetchProfileUser();
-  }, [user]);
+  }, [profileUserId, user]);
 
   return (
-    <div className="InfoCard">
-      <div className="infoHead">
-        <h4>Profile Info</h4>
-        {user._id === profileUserId ? (
-          <div>
-            <UilPen
-              width="2rem"
-              height="1.2rem"
-              onClick={() => setModalOpened(true)}
-            />
-            <ProfileModal
-              modalOpened={modalOpened}
-              setModalOpened={setModalOpened}
-              data = {user}
-            />
+    <div className="info-card">
+      <div className="info-card-header">
+        <h4>Profile Information</h4>
+        {user._id === profileUserId && (
+          <div className="edit-button" onClick={() => setModalOpen(true)}>
+            <UilPen width="2rem" height="1.2rem" />
           </div>
-        ) : (
-          ""
         )}
+        <ProfileModal
+          modalOpened={isModalOpen}
+          setModalOpened={setModalOpen}
+          data={user}
+        />
       </div>
-
-      <div className="info">
-        {/* */}
-        <span>
-          <b>Status </b>
-        </span>
-        <span>{profileUser.relationship}</span>
-      </div>
-      <div className="info">
-        <span>
-          <b>Lives in </b>
-        </span>
-        <span>{profileUser.livesIn}</span>
-      </div>
-      <div className="info">
-        <span>
-          <b>Works at </b>
-        </span>
-        <span>{profileUser.worksAt}</span>
-      </div>
-
-      <button className="button logout-button" onClick={handleLogOut}>Log Out</button>
+      <UserInfo label="Status" value={profileUser.relationship || "N/A"} />
+      <UserInfo label="Lives in" value={profileUser.livesIn || "N/A"} />
+      <UserInfo label="Works at" value={profileUser.worksAt || "N/A"} />
+      <button className="button logout-button" onClick={handleLogOut}>
+        Log Out
+      </button>
     </div>
   );
 };

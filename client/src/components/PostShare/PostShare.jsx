@@ -12,109 +12,109 @@ const PostShare = () => {
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.authReducer.authData);
   const loading = useSelector((state) => state.postReducer.uploading);
-  const [image, setImage] = useState(null);
-  const desc = useRef();
+  const [selectedImage, setSelectedImage] = useState(null);
+  const descriptionRef = useRef();
   const serverPublic = process.env.REACT_APP_PUBLIC_FOLDER;
-  console.log(serverPublic)
-  // handle Image Change
-  const onImageChange = (event) => {
+
+  const handleImageChange = (event) => {
     if (event.target.files && event.target.files[0]) {
-      let img = event.target.files[0];
-      setImage(img);
+      setSelectedImage(event.target.files[0]);
     }
   };
 
-  const imageRef = useRef();
+  const imageInputRef = useRef();
 
-  // handle post upload
-  const handleUpload = async (e) => {
+  const handlePostUpload = async (e) => {
     e.preventDefault();
 
-    //post data
     const newPost = {
-      userId: user._id,
-      desc: desc.current.value,
+        userId: user._id,
+        desc: descriptionRef.current.value,
     };
 
-    // if there is an image with post
-    if (image) {
-      const data = new FormData();
-      const fileName = Date.now() + image.name;
-      data.append("name", fileName);
-      data.append("file", image);
-      newPost.image = fileName;
-      console.log(newPost);
-      try {
-        dispatch(uploadImage(data));
-      } catch (err) {
-        console.log(err);
-      }
+    if (selectedImage) {
+        const formData = new FormData();
+        const fileName = `${Date.now()}_${selectedImage.name}`;
+        formData.append("name", fileName);
+        formData.append("file", selectedImage);
+        newPost.image = fileName;
+
+        try {
+            await dispatch(uploadImage(formData));
+        } catch (error) {
+            console.error("Image upload failed:", error);
+            return;  
+        }
     }
-    dispatch(uploadPost(newPost));
-    resetShare();
+
+    try {
+        await dispatch(uploadPost(newPost));
+        resetForm();
+    } catch (error) {
+        console.error("Post upload failed:", error);
+    }
+};
+
+
+  const resetForm = () => {
+    setSelectedImage(null);
+    descriptionRef.current.value = "";
   };
 
-  // Reset Post Share
-  const resetShare = () => {
-    setImage(null);
-    desc.current.value = "";
-  };
   return (
-    <div className="PostShare">
+    <div className="post-share">
       <img
         src={
           user.profilePicture
-            ? serverPublic + user.profilePicture
-            : serverPublic + "defaultProfile.png"
+            ? `${serverPublic}${user.profilePicture}`
+            : `${serverPublic}defaultProfile.png`
         }
-        alt="Profile"
+        alt="User Profile"
+        className="profile-picture"
       />
-      <div>
+      <div className="post-content">
         <input
           type="text"
-          placeholder="What's happening?"
-          required
-          ref={desc}
+          placeholder="What's on your mind?"
+          ref={descriptionRef}
+          className="post-input"
         />
-        <div className="postOptions">
-          <div
-            className="option"
-            style={{ color: "var(--photo)" }}
-            onClick={() => imageRef.current.click()}
-          >
+        <div className="post-options">
+          <div className="option" style={{ color: "#4CAF50" }} onClick={() => imageInputRef.current.click()}>
             <UilScenery />
             Photo
           </div>
-
-          <div className="option" style={{ color: "var(--video)" }}>
+          <div className="option" style={{ color: "#FF5722" }}>
             <UilPlayCircle />
             Video
           </div>
-          <div className="option" style={{ color: "var(--location)" }}>
+          <div className="option" style={{ color: "#3F51B5" }}>
             <UilLocationPoint />
             Location
           </div>
-          <div className="option" style={{ color: "var(--shedule)" }}>
+          <div className="option" style={{ color: "#FFC107" }}>
             <UilSchedule />
-            Shedule
+            Schedule
           </div>
           <button
-            className="button ps-button"
-            onClick={handleUpload}
+            className="post-button"
+            onClick={handlePostUpload}
             disabled={loading}
           >
-            {loading ? "uploading" : "Share"}
+            {loading ? "Uploading..." : "Share"}
           </button>
-
-          <div style={{ display: "none" }}>
-            <input type="file" ref={imageRef} onChange={onImageChange} />
-          </div>
+          <input
+            type="file"
+            ref={imageInputRef}
+            onChange={handleImageChange}
+            style={{ display: "none" }}
+          />
         </div>
 
-        {image && (
-          <div className="previewImage">
-            <UilTimes onClick={() => setImage(null)} />
-            <img src={URL.createObjectURL(image)} alt="preview" />
+        {selectedImage && (
+          <div className="preview-container">
+            <UilTimes onClick={() => setSelectedImage(null)} className="close-icon" />
+            <img src={URL.createObjectURL(selectedImage)} alt="Preview" className="preview-image" />
           </div>
         )}
       </div>

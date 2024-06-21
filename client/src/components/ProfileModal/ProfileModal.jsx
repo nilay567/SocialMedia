@@ -16,49 +16,62 @@ const ProfileModal = ({ modalOpened, setModalOpened, data }) => {
   const param = useParams();
 
   const { user } = useSelector((state) => state.authReducer.authData);
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const onImageChange = (event) => {
-    if (event.target.files && event.target.files[0]) {
-      let img = event.target.files[0];
-      event.target.name === "profileImage"
-        ? setProfileImage(img)
-        : setCoverImage(img);
+    const imageFile = event.target.files[0];
+    if (event.target.name === "profileImage") {
+      setProfileImage(imageFile);
+    } else if (event.target.name === "coverImage") {
+      setCoverImage(imageFile);
     }
   };
 
-  // form submission
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    let UserData = formData;
+
+    const userData = { ...formData };
+
+    // Upload profile image if selected
     if (profileImage) {
-      const data = new FormData();
+      const formData = new FormData();
       const fileName = Date.now() + profileImage.name;
-      data.append("name", fileName);
-      data.append("file", profileImage);
-      UserData.profilePicture = fileName;
+      formData.append("name", fileName);
+      formData.append("file", profileImage);
+      userData.profilePicture = fileName;
+
       try {
-        dispatch(uploadImage(data));
+        await dispatch(uploadImage(formData));
       } catch (err) {
-        console.log(err);
+        console.error("Error uploading profile image:", err);
       }
     }
+
+    // Upload cover image if selected
     if (coverImage) {
-      const data = new FormData();
+      const formData = new FormData();
       const fileName = Date.now() + coverImage.name;
-      data.append("name", fileName);
-      data.append("file", coverImage);
-      UserData.coverPicture = fileName;
+      formData.append("name", fileName);
+      formData.append("file", coverImage);
+      userData.coverPicture = fileName;
+
       try {
-        dispatch(uploadImage(data));
+        await dispatch(uploadImage(formData));
       } catch (err) {
-        console.log(err);
+        console.error("Error uploading cover image:", err);
       }
     }
-    dispatch(updateUser(param.id, UserData));
-    setModalOpened(false);
+
+    // Update user data
+    try {
+      await dispatch(updateUser(param.id, userData));
+      setModalOpened(false);
+    } catch (err) {
+      console.error("Error updating user:", err);
+    }
   };
 
   return (
@@ -68,85 +81,141 @@ const ProfileModal = ({ modalOpened, setModalOpened, data }) => {
           ? theme.colors.dark[9]
           : theme.colors.gray[2]
       }
-      overlayOpacity={0.55}
+      overlayOpacity={0.75}
       overlayBlur={3}
-      size="55%"
+      size="md"
       opened={modalOpened}
       onClose={() => setModalOpened(false)}
     >
-      <form className="infoForm" onSubmit={handleSubmit}>
-        <h3>Your Info</h3>
-        <div>
-          <input
-            value={formData.firstname}
-            onChange={handleChange}
-            type="text"
-            placeholder="First Name"
-            name="firstname"
-            className="infoInput"
-          />
-          <input
-            value={formData.lastname}
-            onChange={handleChange}
-            type="text"
-            placeholder="Last Name"
-            name="lastname"
-            className="infoInput"
-          />
-        </div>
+      <div className="profile-modal">
+        <h3 className="modal-title">Edit Profile</h3>
+        <form onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label htmlFor="firstname" className="input-label">
+              First Name
+            </label>
+            <input
+              type="text"
+              id="firstname"
+              name="firstname"
+              value={formData.firstname}
+              onChange={handleChange}
+              className="info-input"
+              required
+            />
+          </div>
 
-        <div>
-          <input
-            value={formData.worksAt}
-            onChange={handleChange}
-            type="text"
-            placeholder="Works at"
-            name="worksAt"
-            className="infoInput"
-          />
-        </div>
+          <div className="form-group">
+            <label htmlFor="lastname" className="input-label">
+              Last Name
+            </label>
+            <input
+              type="text"
+              id="lastname"
+              name="lastname"
+              value={formData.lastname}
+              onChange={handleChange}
+              className="info-input"
+              required
+            />
+          </div>
 
-        <div>
-          <input
-            value={formData.livesIn}
-            onChange={handleChange}
-            type="text"
-            placeholder="Lives in"
-            name="livesIn"
-            className="infoInput"
-          />
-          <input
-            value={formData.country}
-            onChange={handleChange}
-            type="text"
-            placeholder="Country"
-            name="country"
-            className="infoInput"
-          />
-        </div>
+          <div className="form-group">
+            <label htmlFor="worksAt" className="input-label">
+              Works at
+            </label>
+            <input
+              type="text"
+              id="worksAt"
+              name="worksAt"
+              value={formData.worksAt}
+              onChange={handleChange}
+              className="info-input"
+            />
+          </div>
 
-        <div>
-          <input
-            value={formData.relationship}
-            onChange={handleChange}
-            type="text"
-            className="infoInput"
-            placeholder="Relationship status"
-            name="relationship"
-          />
-        </div>
+          <div className="form-group">
+            <label htmlFor="livesIn" className="input-label">
+              Lives in
+            </label>
+            <input
+              type="text"
+              id="livesIn"
+              name="livesIn"
+              value={formData.livesIn}
+              onChange={handleChange}
+              className="info-input"
+            />
+          </div>
 
-        <div>
-          Profile image
-          <input type="file" name="profileImage" onChange={onImageChange} />
-          Cover image
-          <input type="file" name="coverImage" onChange={onImageChange} />
-        </div>
+          <div className="form-group">
+            <label htmlFor="country" className="input-label">
+              Country
+            </label>
+            <input
+              type="text"
+              id="country"
+              name="country"
+              value={formData.country}
+              onChange={handleChange}
+              className="info-input"
+            />
+          </div>
 
-        <button className="button infoButton" type="submit">
-          Update
-        </button>
-      </form>
+          <div className="form-group">
+            <label htmlFor="relationship" className="input-label">
+              Relationship Status
+            </label>
+            <input
+              type="text"
+              id="relationship"
+              name="relationship"
+              value={formData.relationship}
+              onChange={handleChange}
+              className="info-input"
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="profileImage" className="input-label">
+              Profile Image
+            </label>
+            <input
+              type="file"
+              id="profileImage"
+              name="profileImage"
+              onChange={onImageChange}
+              className="file-input"
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="coverImage" className="input-label">
+              Cover Image
+            </label>
+            <input
+              type="file"
+              id="coverImage"
+              name="coverImage"
+              onChange={onImageChange}
+              className="file-input"
+            />
+          </div>
+
+          <div className="button-group">
+            <button type="submit" className="button update-button">
+              Update
+            </button>
+            <button
+              type="button"
+              className="button cancel-button"
+              onClick={() => setModalOpened(false)}
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
+      </div>
     </Modal>
   );
 };
