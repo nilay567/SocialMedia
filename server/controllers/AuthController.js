@@ -10,7 +10,7 @@ export const registerUser = async (req, res) => {
   req.body.password = hashedPass
   const newUser = new UserModel(req.body);
   const {username} = req.body
-  const JWTKEY="mySuperSecretKey12345!"
+  const JWTKEY=process.env.JWTKEY
   try {
     // addition new
     const oldUser = await UserModel.findOne({ username });
@@ -36,7 +36,7 @@ export const registerUser = async (req, res) => {
 // Changed
 export const loginUser = async (req, res) => {
   const { username, password } = req.body;
-  const JWTKEY="mySuperSecretKey12345!"
+  const JWTKEY=process.env.JWTKEY
 
   try {
     const user = await UserModel.findOne({ username: username });

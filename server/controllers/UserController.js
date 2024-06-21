@@ -41,7 +41,7 @@ export const updateUser = async (req, res) => {
   const id = req.params.id;
   // console.log("Data Received", req.body)
   const { _id, currentUserAdmin, password } = req.body;
-  const JWTKEY="mySuperSecretKey12345!"
+  const JWTKEY=process.env.JWTKEY
 
   if (id === _id) {
     try {
